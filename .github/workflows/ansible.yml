@@ -9,6 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: echo queloque
+    - name: Install Ansible (lastest)
+      shell: pwsh
+      run: | 
+        pip3 install ansible
+    - name: Install Ansible Galaxy Collection (amazon.aws)
+      shell: pwsh
+      run: |
+        ansible-galaxy collections install amazon.aws
     - name: Authenticate to AWS
       uses: aws-actions/configure-aws-credentials@v2
       with:

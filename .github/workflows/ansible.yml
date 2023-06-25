@@ -6,7 +6,7 @@ on:
   
 jobs:
   ansible-deploy:
-    runs-on: ubuntu-lastes
+    runs-on: ubuntu-lastest
     steps:
     - run: echo queloque
     - name: Authenticate to AWS

@@ -23,8 +23,13 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
-    - name: 
+    - name: Validate Ansible Inventory
       shell: pwsh
       run: | 
         ansible-inventory --inventory inventory.aws_ec2.yml --list
+    - name: Run Ansible Playbook
+      shell: pwsh
+      run: |
+        ansoble-playbook --inventory inventory.aws_ec2.yml playbook.yml
+    
         

@@ -1,0 +1,9 @@
+---
+- name: setup ec2 instances
+  hosts: Ansiblekey
+  task:
+    - name: install Python3-pip
+      apt:
+        name: python3-pip
+        state: present
+        

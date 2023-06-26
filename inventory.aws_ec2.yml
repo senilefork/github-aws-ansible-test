@@ -3,5 +3,5 @@ regions:
   - us-east-2
   
 keyed_groups:
-  - key: aws-ec2-test
+  - key: key_name
     seperator: ''

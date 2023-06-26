@@ -1,6 +1,6 @@
 ---
 - name: setup ec2 instances
-  hosts: aws-ec2-test	
+  hosts: ec2-18-117-91-102.us-east-2.compute.amazonaws.com	
   tasks:
     - name: install Python3-pip
       apt:

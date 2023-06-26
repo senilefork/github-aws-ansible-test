@@ -1,6 +1,6 @@
 ---
 - name: setup ec2 instances
-  hosts: Ansiblekey
+  hosts: aws-ec2-test	
   task:
     - name: install Python3-pip
       apt:

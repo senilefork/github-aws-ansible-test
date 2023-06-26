@@ -3,6 +3,11 @@ name: Ansible Deployment
 on: 
   push:
   workflow_dispatch:
+
+env:
+  inventory-file: inventory.aws_ec2.yml
+  ANSIBLE_HOST_KEY_CHECKING: false
+  ANSIBLE_REMOTE_USER: ec2-user
   
 jobs:
   ansible-deploy:
@@ -23,6 +28,11 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
+    - name: Write SSH Key to Disk
+      shell: pwsh
+      run: |
+        Set-Content -Path mykey -Value '${{ secrets.ANSIBLE_SSH_KEY }}'
+        chmod 400 mykey
     - name: Validate Ansible Inventory
       shell: pwsh
       run: | 
@@ -31,5 +41,6 @@ jobs:
       shell: pwsh
       run: |
         ansible-playbook --inventory inventory.aws_ec2.yml playbook.yml
+    
     
         

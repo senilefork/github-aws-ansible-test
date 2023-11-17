@@ -2,45 +2,68 @@ name: Ansible Deployment
 
 on: 
   push:
-  workflow_dispatch:
+    branches: [main]
 
 env:
-  inventory-file: inventory.aws_ec2.yml
-  ANSIBLE_HOST_KEY_CHECKING: false
-  ANSIBLE_REMOTE_USER: ec2-user
-  
+  AWS_REGION : us-east-1
+  #inventory-file: inventory.aws_ec2.yml
+  #ANSIBLE_HOST_KEY_CHECKING: false
+  #ANSIBLE_REMOTE_USER: ec2-user
+
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+
 jobs:
-  ansible-deploy:
+  AssumeRoleAndCallIdentity: 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.5.3
-    - name: Install Ansible (lastest)
-      shell: pwsh
-      run: | 
-        pip3 install ansible boto3
-    - name: Install Ansible Galaxy Collection (amazon.aws)
-      shell: pwsh
-      run: |
-        ansible-galaxy collection install amazon.aws
-    - name: Authenticate to AWS
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-2
-    - name: Write SSH Key to Disk
-      shell: pwsh
-      run: |
-        Set-Content -Path mykey -Value '${{ secrets.ANSIBLE_SSH_KEY }}'
-        chmod 400 mykey
-    - name: Validate Ansible Inventory
-      shell: pwsh
-      run: | 
-        ansible-inventory --inventory inventory.aws_ec2.yml --list
-    - name: Run Ansible Playbook
-      shell: pwsh
-      run: |
-        ansible-playbook --inventory inventory.aws_ec2.yml playbook.yml
+      - name: Git clone repo
+        uses: actions/checkout@v3
+      - name: configure aws creds 
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::195421763067:role/GitHubAction-AssumeRoleWithAction
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Hello from AWS: WhoAmI
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
+  
+#jobs:
+  #ansible-deploy:
+    #runs-on: ubuntu-latest
+    #steps:
+    #- uses: actions/checkout@v3.5.3
+    #- name: Install Ansible (lastest)
+      #shell: pwsh
+      #run: | 
+        #pip3 install ansible boto3
+    #- name: Install Ansible Galaxy Collection (amazon.aws)
+      #shell: pwsh
+      #run: |
+        #ansible-galaxy collection install amazon.aws
+    #- name: Authenticate to AWS
+      #uses: aws-actions/configure-aws-credentials@v2
+      #with:
+        #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        #aws-region: us-east-2
+    #- name: Write SSH Key to Disk
+      #shell: pwsh
+      #run: |
+        #Set-Content -Path mykey -Value '${{ secrets.ANSIBLE_SSH_KEY }}'
+        #chmod 400 mykey
+    #- name: Validate Ansible Inventory
+      #shell: pwsh
+      #run: | 
+        #ansible-inventory --inventory inventory.aws_ec2.yml --list
+    #- name: Run Ansible Playbook
+      #shell: pwsh
+      #run: |
+        #ansible-playbook --inventory inventory.aws_ec2.yml playbook.yml
     
     
         
